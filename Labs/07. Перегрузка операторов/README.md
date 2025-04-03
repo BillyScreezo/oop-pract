@@ -28,27 +28,36 @@ public:
     // Конструктор класса
     Complex(double real = 0, double imag = 0) : real(real), imag(imag) {}
 
-    // Перегрузка оператора + через метод класса
-    Complex operator+(const Complex& other) const {
-        return Complex(real + other.real, imag + other.imag);
+    // Перегрузка оператора +
+    friend Complex operator+(const Complex& a, const Complex& b) {
+        return Complex(a.real + b.real, a.imag + b.imag);
     }
 
-    // Перегрузка оператора - через метод класса
-    Complex operator-(const Complex& other) const {
-        return Complex(real - other.real, imag - other.imag);
+    // Перегрузка оператора -
+    friend Complex operator-(const Complex& a, const Complex& b) {
+        return Complex(a.real - b.real, a.imag - b.imag);
     }
 
-    // Перегрузка оператора * для умножения комплексных чисел
-    Complex operator*(const Complex& other) const {
-        return Complex(real * other.real - imag * other.imag, real * other.imag + imag * other.real);
+    // Перегрузка оператора *
+    friend Complex operator*(const Complex& a, const Complex& b) {
+        return Complex(a.real * b.real - a.imag * b.imag, a.real * b.imag + a.imag * b.real);
     }
 
-    // Перегрузка оператора == через метод класса
-    bool operator==(const Complex& other) const {
-        return real == other.real && imag == other.imag;
+    // Перегрузка оператора ==
+    friend bool operator==(const Complex& a, const Complex& b) {
+        return a.real == b.real && a.imag == b.imag;
     }
 
-    // Перегрузка оператора << через дружественную функцию
+    // Перегрузка оператора *=
+    Complex& operator*=(const Complex& other) {
+        double realPart = real * other.real - imag * other.imag;
+        double imagPart = real * other.imag + imag * other.real;
+        real = realPart;
+        imag = imagPart;
+        return *this;
+    }
+
+    // Перегрузка оператора <<
     friend std::ostream& operator<<(std::ostream& os, const Complex& c) {
         os << c.real << " + " << c.imag << "i";
         return os;
@@ -62,6 +71,9 @@ int main() {
     std::cout << "c1 - c2: " << (c1 - c2) << "\n";
     std::cout << "c1 * c2: " << (c1 * c2) << "\n";
     std::cout << "c1 == c2: " << (c1 == c2) << "\n";
+
+    c1 *= c2;
+    std::cout << "c1 after *= c2: " << c1 << "\n";
 }
 ```
 
@@ -73,27 +85,19 @@ int main() {
 
 1) **Двумерный вектор (`Vec2d`)**
    - Координаты `x`, `y`
-   - Операторы: `+`, `-`, `<`, `>`, `*` (умножение на число), `<<`
+   - Операторы: `+`, `-`, `<`, `>`, `*` (умножение на число), `<<`, `==`, `!=`, `+=`
 
 2) **Прямоугольник (`Rect`)**
    - Ширина `w`, высота `h`
-   - Операторы: `+`, `-`, `+=`, `++` (постфиксный), `/` (деление на число), `<<`
+   - Операторы: `+`, `-`, `+=`, `++` (постфиксный), `/` (деление на число), `<<`, `==`, `!=`
 
 3) **Вектор в полярных координатах (`VecPolar`)**
    - Длина `L`, угол `phi`
-   - Операторы: `+`, `-`, `*` (умножение на число), `<`, `>`, `<<`
+   - Операторы: `+`, `-`, `*` (умножение на число), `<`, `>`, `<<`, `==`, `!=`, `+=`
 
 4) **Цвет в палитре RGB (`ColorRgb`)**
    - Компоненты `r`, `g`, `b`
-   - Операторы: `+`, `-`, `-=`, `*` (умножение на число), `++`, `<<`
-
-### Дополнительные задания
-1. Перегрузите оператор `==` для всех классов.
-2. Перегрузите оператор `!=` для всех классов.
-3. Добавьте оператор `*=` (умножение на число) в `Vec2d`, `VecPolar` и `ColorRgb`.
-4. Реализуйте оператор `--` (постфиксный) в `ColorRgb` (уменьшение насыщенности цвета).
-5. Реализуйте оператор `+=` для всех классов.
-6. Добавьте оператор `[]` для доступа к отдельным компонентам в `Vec2d` и `ColorRgb`.
+   - Операторы: `+`, `-`, `-=`, `*` (умножение на число), `++`, `<<`, `==`, `!=`, `+=`
 
 ## Вывод
 Перегрузка операторов позволяет работать с пользовательскими классами так же удобно, как со встроенными типами, улучшая читаемость кода. Важно соблюдать семантику операций и не перегружать операторы так, чтобы их поведение было неожиданным.
