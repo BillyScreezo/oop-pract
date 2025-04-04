@@ -16,53 +16,70 @@
 Рассмотрим класс `Complex` для работы с комплексными числами.
 
 ```cpp
+// complex.h
+#ifndef COMPLEX_H
+#define COMPLEX_H
+
 #include <iostream>
 
-// Комплексное число
 class Complex {
 private:
-    // Действительная и мнимая части комплексного числа
     double real, imag;
 
 public:
-    // Конструктор класса
-    Complex(double real = 0, double imag = 0) : real(real), imag(imag) {}
-
-    // Перегрузка оператора +
-    friend Complex operator+(const Complex& a, const Complex& b) {
-        return Complex(a.real + b.real, a.imag + b.imag);
-    }
-
-    // Перегрузка оператора -
-    friend Complex operator-(const Complex& a, const Complex& b) {
-        return Complex(a.real - b.real, a.imag - b.imag);
-    }
-
-    // Перегрузка оператора *
-    friend Complex operator*(const Complex& a, const Complex& b) {
-        return Complex(a.real * b.real - a.imag * b.imag, a.real * b.imag + a.imag * b.real);
-    }
-
-    // Перегрузка оператора ==
-    friend bool operator==(const Complex& a, const Complex& b) {
-        return a.real == b.real && a.imag == b.imag;
-    }
-
-    // Перегрузка оператора *=
-    Complex& operator*=(const Complex& other) {
-        double realPart = real * other.real - imag * other.imag;
-        double imagPart = real * other.imag + imag * other.real;
-        real = realPart;
-        imag = imagPart;
-        return *this;
-    }
-
-    // Перегрузка оператора <<
-    friend std::ostream& operator<<(std::ostream& os, const Complex& c) {
-        os << c.real << " + " << c.imag << "i";
-        return os;
-    }
+    Complex(double real = 0, double imag = 0);
+    
+    friend Complex operator+(const Complex& a, const Complex& b);
+    friend Complex operator-(const Complex& a, const Complex& b);
+    friend Complex operator*(const Complex& a, const Complex& b);
+    friend bool operator==(const Complex& a, const Complex& b);
+    Complex& operator*=(const Complex& other);
+    
+    friend std::ostream& operator<<(std::ostream& os, const Complex& c);
 };
+
+#endif // COMPLEX_H
+```
+
+```cpp
+// complex.cpp
+#include "complex.h"
+
+Complex::Complex(double real, double imag) : real(real), imag(imag) {}
+
+Complex operator+(const Complex& a, const Complex& b) {
+    return Complex(a.real + b.real, a.imag + b.imag);
+}
+
+Complex operator-(const Complex& a, const Complex& b) {
+    return Complex(a.real - b.real, a.imag - b.imag);
+}
+
+Complex operator*(const Complex& a, const Complex& b) {
+    return Complex(a.real * b.real - a.imag * b.imag, a.real * b.imag + a.imag * b.real);
+}
+
+bool operator==(const Complex& a, const Complex& b) {
+    return a.real == b.real && a.imag == b.imag;
+}
+
+Complex& Complex::operator*=(const Complex& other) {
+    double realPart = real * other.real - imag * other.imag;
+    double imagPart = real * other.imag + imag * other.real;
+    real = realPart;
+    imag = imagPart;
+    return *this;
+}
+
+std::ostream& operator<<(std::ostream& os, const Complex& c) {
+    os << c.real << " + " << c.imag << "i";
+    return os;
+}
+```
+
+```cpp
+// main.cpp
+#include "complex.h"
 
 int main() {
     Complex c1(2, 3), c2(1, 4);
