@@ -56,6 +56,67 @@ if (year < 1905 || year > 2030) {
 }
 ```
 
+### `std::exception` и его производные
+
+В стандартной библиотеке C++ определен базовый класс исключений `std::exception`, от которого наследуются другие типы исключений, такие как:
+- `std::runtime_error` – ошибки времени выполнения
+- `std::logic_error` – ошибки логики программы
+- `std::invalid_argument` – некорректные аргументы функций
+- `std::out_of_range` – выход за допустимый диапазон
+- `std::bad_alloc` – ошибка выделения памяти
+
+Этот класс определяет виртуальный метод `what()`, который возвращает строковое описание ошибки:
+```cpp
+try {
+    throw std::runtime_error("Ошибка в программе");
+}
+catch (const std::exception& ex) {
+    std::cout << "Исключение: " << ex.what() << std::endl;
+}
+```
+
+### Почему переопределяют `what()`
+
+Метод `what()` часто переопределяют в пользовательских классах исключений, чтобы передавать более подробную информацию об ошибке. Например:
+```cpp
+#include <exception>
+#include <string>
+
+class FileOpenException : public std::exception {
+private:
+    std::string message;
+public:
+    FileOpenException(const std::string& filename)
+        : message("Не удалось открыть файл: " + filename) {}
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+};
+```
+
+Теперь можно выбрасывать и перехватывать `FileOpenException`:
+```cpp
+#include <iostream>
+#include <fstream>
+
+void openFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw FileOpenException(filename);
+    }
+}
+
+int main() {
+    try {
+        openFile("nonexistent.txt");
+    }
+    catch (const std::exception& ex) {
+        std::cout << "Ошибка: " << ex.what() << std::endl;
+    }
+    return 0;
+}
+```
+
 ### Обработка нескольких типов исключений
 Можно перехватывать разные типы исключений, используя несколько `catch`-блоков:
 ```cpp
@@ -76,7 +137,7 @@ catch (...) {
 
 ### Раскручивание стека
 
-Если исключение, выработанное в текущей исполняемой функции, не было перехвачено в этой функции (`catch` отсутствует или не соответствует типу исключения), программа начинает так называвемое **раскручивание стека**: 
+Если исключение, выработанное в текущей исполняемой функции, не было перехвачено в этой функции (`catch` отсутствует или не соответствует типу исключения), программа начинает так называемое **раскручивание стека**: 
 - Выполнение выходит из текущей функции и переходит к вызывающей.
 - Если в вызывающей функции тоже нет подходящего `catch`, выход продолжается по стеку вызовов.
 - Если в конечном итоге исключение не будет обработано, программа аварийно завершится, часто с сообщением о необработанном исключении.
@@ -107,30 +168,6 @@ int main() {
    - Разработать класс `CsvParseException`, наследованный от `std::exception`.
    - Исключение должно хранить текстовое описание ошибки и номер строки, где она произошла.
    - Использовать `throw CsvParseException` в `CsvReader` при ошибках в `std::stoi`.
-
-Пример реализации класса исключения:
-```cpp
-#include <exception>
-#include <string>
-
-class CsvParseException : public std::exception {
-private:
-    std::string message;
-    int line_number;
-
-public:
-    CsvParseException(const std::string& msg, int line)
-        : message(msg), line_number(line) {}
-
-    const char* what() const noexcept override {
-        return message.c_str();
-    }
-
-    int getLineNumber() const {
-        return line_number;
-    }
-};
-```
 
 3) **Добавить обработку исключений в `MainWindow`**:
    - Перехватывать `CsvParseException` при вызове `CsvReader::readAll()`.
